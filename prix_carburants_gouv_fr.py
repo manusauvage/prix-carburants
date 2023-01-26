@@ -28,10 +28,13 @@ def mean_price_and_density(gas_name, price_data):
         # We have no information about the density of other gas types.
         # FIXME: this should probably be changed to make the script
         # FIXME: more useful/versatile
-        raise ValueError(f"Densité inconnue pour ce type d'essence: {gas_name}")
+        raise ValueError(
+            f"Densité inconnue pour ce type d'essence: {gas_name}"
+            )
     mean = statistics.mean(price_data)
     ratio = density / mean
     return (mean, ratio)
+
 
 def parse_gas_prices_xml(xmlfile, gas_filter=('E10', 'E85')):
     tree = ET.parse(xmlfile)
@@ -47,7 +50,7 @@ def parse_gas_prices_xml(xmlfile, gas_filter=('E10', 'E85')):
         prices = pdv.findall('prix')
         for price in prices:
             gas_name = price.get('nom')
-            if not gas_name in gas_filter:
+            if gas_name not in gas_filter:
                 continue
             gas_price = float(price.get('valeur'))
             # Price data is not consistent, it can be expressed in euros
@@ -58,12 +61,12 @@ def parse_gas_prices_xml(xmlfile, gas_filter=('E10', 'E85')):
             if gas_price > 10.:
                 gas_price = gas_price / 1000.
 
-            if not gas_name in data:
+            if gas_name not in data:
                 data[gas_name] = {}
                 data[gas_name]['prices'] = []
                 data[gas_name]['stations'] = {}
             data[gas_name]['prices'].append(gas_price)
-            if not pdv_id in data[gas_name]['stations']:
+            if pdv_id not in data[gas_name]['stations']:
                 data[gas_name]['stations'][pdv_id] = True
     return data
 
@@ -76,7 +79,10 @@ if __name__ == '__main__':
             f'\nles données officielles sont publiées ici : {url}'
             )
         sys.exit(1)
-    sys.stdout.write("Chargement du fichier XML, si le fichier est gros c'est un peu long...\r")
+    sys.stdout.write(
+        'Chargement du fichier XML, '
+        "si le fichier est gros c'est un peu long...\r"
+        )
     gas_data = parse_gas_prices_xml(sys.argv[1])
     for gas_type in ['E10', 'E85']:
         mean_price, density_ratio = mean_price_and_density(
